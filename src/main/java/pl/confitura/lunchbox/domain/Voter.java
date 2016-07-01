@@ -21,9 +21,9 @@ public class Voter {
     private long lastRunDuration;
 
     @Autowired
-    public Voter(LunchPlacesRepository repository, MetricRegistry metricRegistry) {
+    public Voter(LunchPlacesRepository repository, MetricRegistry metricRegistry, MeteredQueueFactory factory) {
         this.repository = repository;
-        this.voteQueue = new MpscArrayQueue<>(100);
+        this.voteQueue = factory.create("vote", 100_000);
         metricRegistry.register(
                 "background.countVotes",
                 (Gauge<Long>) () -> lastRunDuration

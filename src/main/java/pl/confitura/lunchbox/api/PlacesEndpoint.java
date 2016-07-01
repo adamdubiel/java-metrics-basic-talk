@@ -2,6 +2,7 @@ package pl.confitura.lunchbox.api;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.codahale.metrics.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,18 +36,19 @@ public class PlacesEndpoint {
     }
 
     @RequestMapping(method = RequestMethod.GET)
+    @Timed(absolute = true, name = "endpoint.list")
     public List<LunchPlace> list() {
-        try (Timer.Context c = metricRegistry.timer("endpoint.list").time()) {
-            return lunchPlacesService.list();
-        }
+        return lunchPlacesService.list();
     }
 
     @RequestMapping(path = "/{lunchPlaceName}/upvote", method = RequestMethod.POST)
+    @Timed(absolute = true, name = "endpoint.upvote")
     public void upvote(@PathVariable String lunchPlaceName) {
         voter.castVote(new Voter.Vote(lunchPlaceName, 1, Voter.VoteType.UPVOTE));
     }
 
     @RequestMapping(path = "/{lunchPlaceName}/downvote", method = RequestMethod.POST)
+    @Timed(absolute = true, name = "endpoint.downvote")
     public void downvote(@PathVariable String lunchPlaceName) {
         voter.castVote(new Voter.Vote(lunchPlaceName, 1, Voter.VoteType.DOWNVOTE));
     }

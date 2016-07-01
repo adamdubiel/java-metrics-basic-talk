@@ -1,5 +1,7 @@
 package pl.confitura.lunchbox.domain;
 
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
 import org.jctools.queues.MpscArrayQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,9 +21,13 @@ public class Voter {
     private long lastRunDuration;
 
     @Autowired
-    public Voter(LunchPlacesRepository repository) {
+    public Voter(LunchPlacesRepository repository, MetricRegistry metricRegistry) {
         this.repository = repository;
         this.voteQueue = new MpscArrayQueue<>(100);
+        metricRegistry.register(
+                "background.countVotes",
+                (Gauge<Long>) () -> lastRunDuration
+        );
     }
 
     public void castVote(Vote vote) {
@@ -30,6 +36,7 @@ public class Voter {
 
     @Scheduled(fixedDelayString = "${voteCounter.delay:10000}")
     public void countVotes() {
+        long startTime = System.currentTimeMillis();
         logger.info("Start counting votes");
         voteQueue.drain((v) -> {
                     switch (v.type) {
@@ -44,6 +51,7 @@ public class Voter {
 
         );
         logger.info("Done counting votes");
+        lastRunDuration = System.currentTimeMillis() - startTime;
     }
 
     public static class Vote {

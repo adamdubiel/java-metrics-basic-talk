@@ -1,0 +1,16 @@
+version: "2"
+services:
+  graphite:
+    image: hopsoft/graphite-statsd
+    ports:
+      - "2003-2004:2003-2004"
+      - "2023-2024:2023-2024"
+      - "8125:8125/udp"
+      - "8126:8126"
+      - "80:80"
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - graphite

@@ -1,6 +1,6 @@
-# Confitura 2016 - Metrics
+# Java Metrics Basic Talk
 
-Materials for my [Confitura 2016](http://confitura.pl) talk.
+Materials for "What is your app doint when you are not around?" talk.
 
 ## Tags
 
